@@ -1,0 +1,446 @@
+<!--
+  ~ Copyright (c) 2022 Chris James.
+  ~    This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<html>
+<head>
+    <style>
+h1,h2,h3,h4,p,table {
+    font-family: sans-serif;
+    }
+code {
+    font-family: monospace;
+    font-size: 1.1em;
+}
+pre.code {
+    background-color: rgba(0.0,0,0,0.1);
+    padding: 4px;
+    border-radius: 4px;
+}
+td.attr {
+    padding-right: 10px;
+    width: 7em;
+    text-align: right;
+    font: 1em sans-serif;
+}
+td.value {    
+    font: 1.2em monospace;
+}
+td.code {
+    padding-right: 1em;
+    font: 1.2em monospace;
+}
+
+
+
+    </style>
+    <h1>Antlr4SyntaxRailroadDiagram Gradle Plugin</h1>
+</head>
+<body>
+<p>
+    Generates Railroad-style syntax diagrams as a single HTML file from Antlr4 grammars in your project.</br>
+    Provides a single new task, <code>antlr4SyntaxRailroadDiagram</code>. The task is not automatically inserted into
+    your build. You must add it as a dependency on whichever task makes sense for your project e.g.
+</p>
+<pre class="code">
+    tasks.shadowDistZip {
+        dependsOn(tasks["antlr4SyntaxRailroadDiagram"])
+    }</br>
+</pre>
+<p>The task is configured with a matching <code>antlr4SyntaxRailroadDiagram</code> extension</p>
+<pre class="code">
+antlr4SyntaxRailroadDiagram {
+    inputGrammarName = "parsergrammar"
+    inputGrammarDirectory: File? = null
+    sourceSetName = "main"
+    documentTitle = "Railroad Syntax Diagram"
+    documentName = "railroadsyntaxdiagram.html"
+    curveRadius = 10f
+    innerPadding = 10f
+    pathWidth = 3f
+    ruleStartCharSize = 14f
+    ruleCharSize = 12f
+    literalCharSize = 12f
+    embedStyleFile: File? = null
+    outputDirectory = ""
+}
+</pre>
+<p>Example: A typical configuration</p>
+<pre class="code">
+antlr4SyntaxRailroadDiagram {
+    inputGrammarName="DomainLanguageParser" // Our grammar is defined in "DomainLanguageParser.g4" and "DomainLanguageLexer.g4"
+    documentTitle = "Specialised Language for Expressing a Solution in a Particular Domain"
+    documentName="DomainLanguageSyntaxDiagram.html"
+    outputDirectory = "$buildDir/distribution/docs"
+}
+</pre>
+<h3 id="grammar-location">Grammar Location</h3>
+<p>The plugin will search the sourceset with the name specified in <a href="#source-set-name"><code>sourceSetName</code></a>
+    for a file named <a href="#input-grammar-name"><code>&lt;inputGrammarName&gt;.g4</code></a>. Grammar includes
+    (including lexical grammars) are expected to be relative to the directory containing the specified grammar file.</p>
+<h3 id="examples">Examples</h3>
+<p>
+    <a href="/examples/kotlin/kotlin.html">Kotlin Syntax Diagram</a>
+    <a href="/examples/swift5/swift5.html">Swift 5 Syntax Diagram</a>
+    <a href="/examples/typescript/typescript.html">Typescript Syntax Diagram</a>
+</p>
+<h2>Extension Parameters</h2>
+
+<h3 id="input-grammar-name">inputGrammarName</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">String</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value"> "parsergrammar"</td>
+    </tr>
+</table>
+<p>Name of the <i>parser</i> or <i>combined</i> grammar to process. All grammars are assumed to have a <code>g4</code>
+    file extension.</p>
+
+<h3 id="input-grammar-directory">inputGrammarDirectory</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">File</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">Not Set</td>
+    </tr>
+</table>
+<p>Explicity specify the directory where the Antlr gammars can be found. If set, this will override the directory found
+    in the search method described in <a href="#grammar-location">Grammar Location</a>.</p>
+
+
+<h3 id="source-set-name">sourceSetName</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">String</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">"main"</td>
+    </tr>
+</table>
+<p>Name of the sourceset to search for the path containing the grammar identified by <a
+        href="#input-grammar-name"><code>inputGrammarName</code></a>.</p>
+
+<h3 id="document-title">documentTitle </h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">String</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">"Railroad Syntax Diagram"</td>
+    </tr>
+</table>
+<p>Title of the document. The <code>title</code> and <code>h1</code> elements will be set to this value in the generated
+    document.</p>
+
+<h3 id="document-name">documentName</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">String</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">"railroadsyntaxdiagram.html"</td>
+    </tr>
+</table>
+<p>Name of the file that will be generated in the <a href="#output-directory">output directory</a>.</p>
+
+<h3 id="curve-radius">curveRadius</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">Float</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">10.0</td>
+    </tr>
+</table>
+<p>Radius of curves in diagram paths. This value is used to calculate diagram positioning and may also be used in the <a
+        href="#default-styles">embedded styles</a>.</p>
+
+<h3 id="inner-padding">innerPadding</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">Float</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">10.0</td>
+    </tr>
+</table>
+<p>Padding inside rule references. This value is used to calculate diagram positioning and may also be used in the <a
+        href="#default-styles">embedded style</a>.</p>
+
+<h3 id="path-width">pathWidth</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">Float</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">2.0</td>
+    </tr>
+</table>
+<p>Width of path lines. This value is used to calculate diagram positioning and may also be used in the <a
+        href="#default-styles">embedded styles</a>.</p>
+
+<h3 id="rule-start-char-size">ruleStartCharSize</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">Float</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">14.0</td>
+    </tr>
+</table>
+<p>Estimated width of character in rule start symbol. This value is used to calculate diagram positioning and may also
+    be used in the <a href="#default-styles">embedded styles</a>.</p>
+
+<h3 id="rule-char-size">ruleCharSize</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">Float</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">12.0</td>
+    </tr>
+</table>
+<p>Estimated width of character in a parser or lexer rule reference symbol. This value is used to calculate diagram
+    positioning and may also be used in the <a href="#default-styles">embedded styles</a>.</p>
+
+<h3 id="literal-char-size">literalCharSize</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">Float</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">12.0</td>
+    </tr>
+</table>
+<p>Estimated width of character in a lexer literal symbol. This value is used to calculate diagram positioning and may
+    also be used in the <a href="#default-styles">embedded styles</a>.</p>
+
+<h3 id="output-directory">outputDirectory</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">String</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">"" (Empty String)</td>
+    </tr>
+</table>
+<p>Path to the directory that the document will be generated in. The name of the document is specified by <a
+        href="#document-name"><code>documentName</code></a>.</p>
+
+<h3 id="embed-style-file">embedStyleFile</h3>
+<table class="attrs">
+    <tr>
+        <td class="attr">Type</td>
+        <td class="value">File</td>
+    </tr>
+    <tr>
+        <td class="attr">Default Value</td>
+        <td class="value">Not Set</td>
+    </tr>
+</table>
+<p>A File containing HTML Style definitions to use instead of the default styles.</br>
+    Some of the values configured in the antlr4SyntaxRailroadDiagram extension can be used in the style definitions by
+    including <a href="#available-replacement-tags">replacement tags</a>.
+</p>
+<p>Note that the units for these values are defined by the style.</p>
+<h4 id="available-replacement-tags">Available Replacement Tags</h4>
+<table>
+    <tr>
+        <th>Value</th>
+        <th>Replacement Tag</th>
+        <th>Comment</th>
+    </tr>
+    <tr>
+        <td class="code">CURVE_RADIUS</td>
+        <td class="code">${CURVE_RADIUS}</td>
+        <td>Radius of curves in diagram paths</td>
+    </tr>
+    <tr>
+        <td class="code">INNER_PADDING</td>
+        <td class="code">${INNER_PADDING}</td>
+        <td>Padding inside rule references</td>
+    </tr>
+    <tr>
+        <td class="code">PATH_WIDTH</td>
+        <td class="code">${PATH_WIDTH}</td>
+        <td>Width of path lines</td>
+    </tr>
+    <tr>
+        <td class="code">RULE_START_CHAR_SIZE</td>
+        <td class="code">${RULE_START_CHAR_SIZE}</td>
+        <td>Estimated width of character in rule start symbol</td>
+    </tr>
+    <tr>
+        <td class="code">RULE_CHAR_SIZE</td>
+        <td class="code">${RULE_CHAR_SIZE}</td>
+        <td>Estimated width of character in a parser or lexer rule reference symbol</td>
+    </tr>
+    <tr>
+        <td class="code">LITERAL_CHAR_SIZE</td>
+        <td class="code">${LITERAL_CHAR_SIZE}</td>
+        <td>Estimated width of character in a lexer literal symbol</td>
+    </tr>
+    <tr>
+        <td class="code">SEQUENCE_CONNECTOR_LEN</td>
+        <td class="code">${SEQUENCE_CONNECTOR_LEN}</td>
+        <td>Length of connector path segments between rule sequences</td>
+    </tr>
+    <tr>
+        <td class="code">ITEM_HEIGHT</td>
+        <td class="code">${ITEM_HEIGHT}</td>
+        <td>Height of single rule reference or lexical literal</td>
+    </tr>
+</table>
+
+<h4 id="default-styles">Default Styles</h4>
+<pre class="code">
+h1 {
+    font:21px sans-serif;
+    }
+
+div.rule-section {
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 6px;
+    margin-bottom: 8px;
+    width:fit-content;
+    min-width: 100%;
+    }
+
+div.cross-reference {
+    border-radius: 5px;
+    background: rgba(0,0,0,0.05);
+    padding: 6px;
+    margin:4px;
+    }
+
+a.cross-reference {
+    font: italic 14px sans-serif;
+    }
+
+p.cross-reference {
+    font: 14px sans-serif;
+    }
+
+svg.rrd line {
+        stroke-width:${PATH_WIDTH};
+        stroke:black;
+        fill:rgba(0,0,0,0);
+        }
+
+svg.rrd path {
+        stroke-width:${PATH_WIDTH};
+        stroke:black;
+        fill:rgba(0,0,0,0);
+        }
+
+svg.rrd path.symbol {
+        stroke-width:1;
+        stroke:black;
+        fill:black;
+        }
+
+svg.rrd circle.rule-start{
+    stroke-width:${PATH_WIDTH};
+    stroke:black;
+    fill:rgb(246, 200, 200);
+    }
+
+ svg.rrd rect.rule-start{
+        stroke-width:${PATH_WIDTH};
+        stroke:black;
+        fill:rgb(246, 200, 200);
+    }
+
+svg.rrd text.rule-start {
+        font:italic ${RULE_START_CHAR_SIZE}px monospace;
+        text-anchor:middle;
+        }
+
+svg.rrd path.rule-end {
+        stroke-width:${PATH_WIDTH};
+        stroke:black;
+        fill:rgba(0,0,0,0);
+        }
+
+svg.rrd rect.lexer {
+        stroke-width:${PATH_WIDTH};
+        stroke:black;
+        fill:rgb(246, 255, 204);
+        }
+
+svg.rrd text.lexer {
+        font:italic ${RULE_CHAR_SIZE}px monospace;
+        text-anchor:middle;
+        }
+
+svg.rrd rect.lexer-literal {
+        stroke-width:${PATH_WIDTH};
+        stroke:black;
+        fill:rgb(246, 255, 204);
+        }
+
+svg.rrd circle.lexer-literal {
+    stroke-width:${PATH_WIDTH};
+    stroke:black;
+    fill:rgb(246, 255, 204);
+    }
+
+svg.rrd text.lexer-literal {
+    font:bold ${LITERAL_CHAR_SIZE}px monospace;
+    text-anchor:middle;
+    }
+
+svg.rrd rect.parser {
+        stroke-width:${PATH_WIDTH};
+        stroke:black;
+        fill:hsl(120,100%,90%);
+        }
+
+svg.rrd text.parser {
+        font:italic ${RULE_CHAR_SIZE}px monospace;
+        text-anchor:middle;
+        }
+
+</pre>
+</body>
+</html>
