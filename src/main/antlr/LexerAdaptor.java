@@ -23,30 +23,28 @@ import org.antlr.v4.runtime.misc.Interval;
 public abstract class LexerAdaptor extends Lexer {
 
     /**
-     *  Generic type for OPTIONS, TOKENS and CHANNELS
+     * Generic type for OPTIONS, TOKENS and CHANNELS
      */
     private static final int PREQUEL_CONSTRUCT = -10;
     private static final int OPTIONS_CONSTRUCT = -11;
-
-    public LexerAdaptor(CharStream input) {
-        super(input);
-    }
-
     /**
      * Track whether we are inside of a rule and whether it is lexical parser. _currentRuleType==Token.INVALID_TYPE
      * means that we are outside of a rule. At the first sign of a rule name reference and _currentRuleType==invalid, we
      * can assume that we are starting a parser rule. Similarly, seeing a token reference when not already in rule means
      * starting a token rule. The terminating ';' of a rule, flips this back to invalid type.
-     *
+     * <p>
      * This is not perfect logic but works. For example, "grammar T;" means that we start and stop a lexical rule for
      * the "T;". Dangerous but works.
-     *
+     * <p>
      * The whole point of this state information is to distinguish between [..arg actions..] and [charsets]. Char sets
      * can only occur in lexical rules and arg actions cannot occur.
      */
     private int _currentRuleType = Token.INVALID_TYPE;
-
     private boolean insideOptionsBlock = false;
+
+    public LexerAdaptor(CharStream input) {
+        super(input);
+    }
 
     public int getCurrentRuleType() {
         return _currentRuleType;
@@ -76,8 +74,8 @@ public abstract class LexerAdaptor extends Lexer {
         int oldMode = _mode;
         int newMode = popMode();
         boolean isActionWithinAction = _modeStack.size() > 0
-            && newMode == ANTLRv4Lexer.TargetLanguageAction
-            && oldMode == newMode;
+                && newMode == ANTLRv4Lexer.TargetLanguageAction
+                && oldMode == newMode;
 
         if (isActionWithinAction) {
             setType(ANTLRv4Lexer.ACTION_CONTENT);
@@ -89,18 +87,15 @@ public abstract class LexerAdaptor extends Lexer {
         if ((_type == ANTLRv4Lexer.OPTIONS || _type == ANTLRv4Lexer.TOKENS || _type == ANTLRv4Lexer.CHANNELS)
                 && getCurrentRuleType() == Token.INVALID_TYPE) { // enter prequel construct ending with an RBRACE
             setCurrentRuleType(PREQUEL_CONSTRUCT);
-        } else if (_type == ANTLRv4Lexer.OPTIONS && getCurrentRuleType() == ANTLRv4Lexer.TOKEN_REF)
-        {
+        } else if (_type == ANTLRv4Lexer.OPTIONS && getCurrentRuleType() == ANTLRv4Lexer.TOKEN_REF) {
             setCurrentRuleType(OPTIONS_CONSTRUCT);
         } else if (_type == ANTLRv4Lexer.RBRACE && getCurrentRuleType() == PREQUEL_CONSTRUCT) { // exit prequel construct
             setCurrentRuleType(Token.INVALID_TYPE);
-        } else if (_type == ANTLRv4Lexer.RBRACE && getCurrentRuleType() == OPTIONS_CONSTRUCT)
-        { // exit options
+        } else if (_type == ANTLRv4Lexer.RBRACE && getCurrentRuleType() == OPTIONS_CONSTRUCT) { // exit options
             setCurrentRuleType(ANTLRv4Lexer.TOKEN_REF);
         } else if (_type == ANTLRv4Lexer.AT && getCurrentRuleType() == Token.INVALID_TYPE) { // enter action
             setCurrentRuleType(ANTLRv4Lexer.AT);
-        } else if (_type == ANTLRv4Lexer.SEMI && getCurrentRuleType() == OPTIONS_CONSTRUCT)
-        { // ';' in options { .... }. Don't change anything.
+        } else if (_type == ANTLRv4Lexer.SEMI && getCurrentRuleType() == OPTIONS_CONSTRUCT) { // ';' in options { .... }. Don't change anything.
         } else if (_type == ANTLRv4Lexer.END_ACTION && getCurrentRuleType() == ANTLRv4Lexer.AT) { // exit action
             setCurrentRuleType(Token.INVALID_TYPE);
         } else if (_type == ANTLRv4Lexer.ID) {
@@ -135,5 +130,5 @@ public abstract class LexerAdaptor extends Lexer {
         setCurrentRuleType(Token.INVALID_TYPE);
         insideOptionsBlock = false;
         super.reset();
-    }   
+    }
 }

@@ -37,7 +37,7 @@ class TestDiagram {
             buildDiagram(parser.processGrammar(grammarPath))
         )
 
-        File("./docs/examples/kotlin/kotlin.html").writeText(diagram.render())
+        File("./docs/kotlin.html").writeText(diagram.render())
     }
 
     @Test
@@ -50,7 +50,7 @@ class TestDiagram {
             buildDiagram(parser.processGrammar(grammarPath))
         )
 
-        File("./docs/examples/swift5/swift5.html").writeText(diagram.render())
+        File("./docs/swift5.html").writeText(diagram.render())
     }
 
     @Test
@@ -63,7 +63,7 @@ class TestDiagram {
             buildDiagram(parser.processGrammar(grammarPath))
         )
 
-        File("./docs/examples/typescript/typescript.html").writeText(diagram.render())
+        File("./docs/typescript.html").writeText(diagram.render())
     }
 
 }

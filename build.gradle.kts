@@ -29,7 +29,7 @@ plugins {
     id("com.gradle.plugin-publish") version "1.0.0"
 }
 
-group = "com.cjsoftware"
+group = "io.github.cjsoftware-plugin"
 version = getBuildVersion()
 
 repositories {
@@ -112,7 +112,7 @@ gradlePlugin {
     plugins {
         create("Antlr4SyntaxRailroadDiagramPlugin") {
             id = "$group.${project.name}"
-            implementationClass = "$group.antlr4docgen.Antlr4SyntaxRailroadDiagramPlugin"
+            implementationClass = "com.cjsoftware.antlr4docgen.Antlr4SyntaxRailroadDiagramPlugin"
             displayName = "Antlr4 Syntax Railroad Diagram"
             description = "Generate Syntax Railroad Diagram from Antlr4 Grammar"
         }
