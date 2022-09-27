@@ -40,7 +40,7 @@
 parser grammar ANTLRv4Parser;
 
 
-options { tokenVocab = ANTLRv4Lexer; }
+options { tokenVocab = 'com/cjsoftware/antlr4docgen/parser/ANTLRv4Lexer'; }
 // The main entry point for parsing a v4 grammar.
 grammarSpec
    : grammarDecl prequelConstruct* rules modeSpec* EOF

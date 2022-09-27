@@ -19,8 +19,6 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.*
 
-val genSourcePath = "${projectDir}/src/main/kotlin/com/cjsoftware/antlr4docgen" // LMAO. Yah. Hacky.Wow
-
 plugins {
     kotlin("jvm") version "1.7.10"
     `java-gradle-plugin`
@@ -49,43 +47,25 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
-tasks.register("embedVersion", DefaultTask::class.java) {
-    doFirst {
-        file(genSourcePath).mkdirs()
-        file("$genSourcePath/version.kt")
-            .writeText(
-                "const val versionName = \"$version\"\n"
-            )
-
-    }
-}
-
-
 tasks.compileKotlin {
-    dependsOn(tasks["embedVersion"])
+    dependsOn(tasks["generateGrammarSource"])
 }
 
-tasks.register("stupidCopy", Copy::class) {
-    from("src/main/antlr") {
-        include("*.java")
-    }
-    into("$buildDir/generated-src/antlr/main/com/cjsoftware/antlr4docgen/parser")
+tasks.compileTestKotlin {
+    dependsOn(tasks["generateTestGrammarSource"])
 
 }
 
 tasks.generateGrammarSource {
-    dependsOn(tasks["stupidCopy"])
     maxHeapSize = "64m"
-
     arguments.addAll(
         arrayOf(
             "-visitor",
             "-no-listener",
-            "-package", "com.cjsoftware.antlr4docgen.parser"
+            "-package", "com.cjsoftware.antlr4docgen.parser",
+            "-lib", "$projectDir/antlrshared"
         )
     )
-
-    outputDirectory = File("$buildDir/generated-src/antlr/main/com/cjsoftware/antlr4docgen/parser")
 }
 
 tasks.compileKotlin {
@@ -99,13 +79,22 @@ fun getBuildVersion(): String =
         }
     }.let {
         val buildNo = it["VERSION_BUILD"].let {
-            if (it is String) it.toInt() + 1 else 0
+            if (it != null) {
+                if (it is String) it.toInt() + 1 else 0
+            } else {
+                throw GradleException("Unable to read VERSION_BUILD")
+            }
         }
-        it["VERSION_BUILD"] = buildNo.toString()
+        val major = it["VERSION_MAJOR"].let {
+            it?.toString() ?: throw GradleException("Unable to read VERSION_MAJOR")
+        }
+        val minor = it["VERSION_MINOR"].let {
+            it?.toString() ?: throw GradleException("Unable to read VERSION_MINOR")
+        }
         FileOutputStream(file("version.properties")).use { fso ->
             it.store(fso, "")
         }
-        "${it["VERSION_MAJOR"]}.${it["VERSION_MINOR"]}.${buildNo.toString().padStart(4, '0')}"
+        "$major.$minor.${buildNo.toString().padStart(4, '0')}"
     }
 
 gradlePlugin {

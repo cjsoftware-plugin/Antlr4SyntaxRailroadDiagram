@@ -31,7 +31,7 @@ class GrammarSpecVisitor(private val grammarModelBuilder: GrammarModelBuilder) :
             if (ctx.INT() != null) {
                 ctx.INT().text
             } else if (ctx.STRING_LITERAL() != null) {
-                (ctx.STRING_LITERAL() as TerminalNode).text
+                (ctx.STRING_LITERAL() as TerminalNode).text.removePrefix("'").removeSuffix("'")
             } else {
                 ctx.identifier().map { it.TOKEN_REF()?.text }.joinToString(separator = ".")
             }

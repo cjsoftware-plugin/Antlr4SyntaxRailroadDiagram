@@ -66,4 +66,16 @@ class TestDiagram {
         File("./docs/typescript.html").writeText(diagram.render())
     }
 
+    @Test
+    fun testGFSDiagram() {
+        val grammarPath = File("$TEST_RESOURCE_PATH/antlr_gfs/com/cjsoftware/script/GFTRecipeParser.g4")
+        val parser = GrammarModelBuilder(DefaultStreamProvider(grammarPath.parentFile))
+        val diagram = Diagram(
+            "Typescript syntax diagram generated from grammar at https://github.com/antlr/grammars-v4/tree/master/javascript/typescript",
+            DiagramSettings.processStyleFile(requireNotNull(this::class.java.getResourceAsStream("default_styles.txt"))),
+            buildDiagram(parser.processGrammar(grammarPath))
+        )
+
+        File("./docs/typescript.html").writeText(diagram.render())
+    }
 }
